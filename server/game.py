@@ -9,6 +9,8 @@ from overcooked_ai_py.planning.planners import MotionPlanner, NO_COUNTERS_PARAMS
 from human_aware_rl.rllib.rllib import load_agent
 import random, os, pickle, json
 import ray
+from pathlib import Path
+from agent import get_apag_agent
 
 # Relative path to where all static pre-trained agents are stored on server
 AGENT_DIR = None
@@ -591,6 +593,16 @@ class OvercookedGame(Game):
                 # Always kill ray after loading agent, otherwise, ray will crash once process exits
                 if ray.is_initialized():
                     ray.shutdown()
+
+        elif npc_id.lower().startswith("sb3"):
+            pass
+        
+        elif npc_id.lower().startswith("apag"):
+            fpath = os.path.join(AGENT_DIR, npc_id)
+            agent = get_apag_agent(fpath, idx)
+            return agent
+            # pass
+            
         else:
             try:
                 fpath = os.path.join(AGENT_DIR, npc_id, 'agent.pickle')
@@ -887,4 +899,48 @@ class TutorialAI():
         self.curr_tick = -1
         self.curr_phase += 1
 
+
+class OldVersionOvercookedGame(Game):
+    def __init__(self, layouts=["cramped_room"], mdp_params={}, num_players=2, gameTime=30, playerZero='human', playerOne='human', showPotential=False, randomized=False, **kwargs):
+        super(OvercookedGame, self).__init__(**kwargs)
+        self.show_potential = showPotential
+        self.mdp_params = mdp_params
+        self.layouts = layouts
+        self.max_players = int(num_players)
+        self.mdp = None
+        self.mp = None
+        self.score = 0
+        self.phi = 0
+        self.max_time = min(int(gameTime), MAX_GAME_TIME)
+        self.npc_policies = {}
+        self.npc_state_queues = {}
+        self.action_to_overcooked_action = {
+            "STAY" : Action.STAY,
+            "UP" : Direction.NORTH,
+            "DOWN" : Direction.SOUTH,
+            "LEFT" : Direction.WEST,
+            "RIGHT" : Direction.EAST,
+            "SPACE" : Action.INTERACT
+        }
+        self.ticks_per_ai_action = 4
+        self.curr_tick = 0
+        self.human_players = set()
+        self.npc_players = set()
+
+        if randomized:
+            random.shuffle(self.layouts)
+
+        if playerZero != 'human':
+            player_zero_id = playerZero + '_0'
+            self.add_player(player_zero_id, idx=0, buff_size=1, is_human=False)
+            self.npc_policies[player_zero_id] = self.get_policy(playerZero, idx=0)
+            self.npc_state_queues[player_zero_id] = LifoQueue()
+
+        if playerOne != 'human':
+            player_one_id = playerOne + '_1'
+            self.add_player(player_one_id, idx=1, buff_size=1, is_human=False)
+            self.npc_policies[player_one_id] = self.get_policy(playerOne, idx=1)
+            self.npc_state_queues[player_one_id] = LifoQueue()
+            
+            
     
