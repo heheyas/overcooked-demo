@@ -10,7 +10,7 @@ from human_aware_rl.rllib.rllib import load_agent
 import random, os, pickle, json
 import ray
 from pathlib import Path
-from agent import get_apag_agent
+from agent import get_apag_agent, RandomTrial
 
 # Relative path to where all static pre-trained agents are stored on server
 AGENT_DIR = None
@@ -599,10 +599,15 @@ class OvercookedGame(Game):
         
         elif npc_id.lower().startswith("apag"):
             fpath = os.path.join(AGENT_DIR, npc_id)
+            # print("before")
             agent = get_apag_agent(fpath, idx)
+            # print("after")
             return agent
             # pass
             
+        elif npc_id.lower().startswith("trial"):
+            return RandomTrial()
+        
         else:
             try:
                 fpath = os.path.join(AGENT_DIR, npc_id, 'agent.pickle')

@@ -1,0 +1,30 @@
+Exception on / [GET]
+Traceback (most recent call last):
+  File "/opt/czl/anaconda3/envs/harl/lib/python3.7/site-packages/flask/app.py", line 2073, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/opt/czl/anaconda3/envs/harl/lib/python3.7/site-packages/flask/app.py", line 1518, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/opt/czl/anaconda3/envs/harl/lib/python3.7/site-packages/flask/app.py", line 1516, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/opt/czl/anaconda3/envs/harl/lib/python3.7/site-packages/flask/app.py", line 1502, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+  File "/opt/czl/self/overcooked_web/self_overcooked_demo/overcooked-demo/server/app.py", line 339, in index
+    agent_names = get_agent_names()
+  File "/opt/czl/self/overcooked_web/self_overcooked_demo/overcooked-demo/server/app.py", line 327, in get_agent_names
+    return [d for d in os.listdir(AGENT_DIR) if os.path.isdir(os.path.join(AGENT_DIR, d))]
+FileNotFoundError: [Errno 2] No such file or directory: './static/assets/agents'
+Exception on / [GET]
+Traceback (most recent call last):
+  File "/opt/czl/anaconda3/envs/harl/lib/python3.7/site-packages/flask/app.py", line 2073, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/opt/czl/anaconda3/envs/harl/lib/python3.7/site-packages/flask/app.py", line 1518, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/opt/czl/anaconda3/envs/harl/lib/python3.7/site-packages/flask/app.py", line 1516, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/opt/czl/anaconda3/envs/harl/lib/python3.7/site-packages/flask/app.py", line 1502, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+  File "/opt/czl/self/overcooked_web/self_overcooked_demo/overcooked-demo/server/app.py", line 339, in index
+    agent_names = get_agent_names()
+  File "/opt/czl/self/overcooked_web/self_overcooked_demo/overcooked-demo/server/app.py", line 327, in get_agent_names
+    return [d for d in os.listdir(AGENT_DIR) if os.path.isdir(os.path.join(AGENT_DIR, d))]
+FileNotFoundError: [Errno 2] No such file or directory: './static/assets/agents'

@@ -1,5 +1,7 @@
 from overcooked_ai_py.agents.agent import Agent
+import numpy as np
 import torch
+import random
 from pathlib import Path
 from stable_baselines3.common.utils import obs_as_tensor
 from overcooked_ai_py.mdp.actions import Action
@@ -32,13 +34,11 @@ class ApagAgentNewVersion(Agent):
     def action_probabilities(self, state):
         # NOTE code for test
         obs = self.featurize(state, debug=False)
-        my_obs = obs[self.agent_index]
+        my_obs = obs[self.agent_index].astype(np.float32)
         if not isinstance(my_obs, torch.Tensor):
             my_obs = obs_as_tensor(my_obs, next(self.actor_critic.parameters()).device)
             
         my_obs = my_obs.unsqueeze(0)
-        my_obs = my_obs.permute(0, 3, 1, 2)[:, 0:20].float()
-            
         _, feats, rnn_hxs = self.actor_critic.base(my_obs, rnn_hxs, None)
         
         dist = self.actor_critic.dist(feats)
@@ -48,12 +48,12 @@ class ApagAgentNewVersion(Agent):
     def action(self, state):
         # NOTE code only for test
         obs = self.featurize(state)
-        my_obs = obs[self.agent_index]
+        # print(obs[0].shape)
+        my_obs = obs[self.agent_index].astype(np.float32)
         if not isinstance(my_obs, torch.Tensor):
             my_obs = obs_as_tensor(my_obs, next(self.actor_critic.parameters()).device)
-         
+        
         my_obs = my_obs.unsqueeze(0)
-        my_obs = my_obs.permute(0, 3, 1, 2)[:, 0:20].float()
         _, action, action_log_prob, rnn_hxs = self.actor_critic.act(my_obs, self.rnn_hxs, None)
         
         agent_action_info = {
@@ -77,12 +77,18 @@ def get_apag_agent(save_path, agent_index):
             "bc_schedule" : 0,
         }
     
-    if config["layout_name"] in old_name_to_new_name.keys():
-        config["layout_name"] = old_name_to_new_name[config["layout_name"]]
-        config["mdp_params"]["layout_name"] = config["layout_name"]
-    
+    # if config["layout_name"] in old_name_to_new_name.keys():
+    #     config["layout_name"] = old_name_to_new_name[config["layout_name"]]
+    #     config["mdp_params"]["layout_name"] = config["layout_name"]
+   
+    # print("before") 
     env = OvercookedMultiAgent.from_config(config)
+    # print("after")
     featurize_fn = env.featurize_fn_map["ppo"]
+    print(f"======{agent_index}=====")
     return ApagAgentNewVersion(policy, agent_index, featurize_fn)
     
-    
+class RandomTrial(Agent):
+    def action(self, state):
+        action_idx = random.randint(0, 5)
+        return Action.INDEX_TO_ACTION[action_idx], None
